@@ -3,8 +3,9 @@ Contains abstract functionality for learning locally linear sparse model.
 """
 import numpy as np
 import scipy as sp
-from sklearn.linear_model import Ridge, lars_path
+#from sklearn.linear_model import Ridge, lars_path
 from sklearn.utils import check_random_state
+from sklearn.tree import DecisionTreeRegressor,DecisionTreeClassifier
 
 
 class LimeBase(object):
@@ -48,7 +49,7 @@ class LimeBase(object):
 
     def forward_selection(self, data, labels, weights, num_features):
         """Iteratively adds features to the model"""
-        clf = Ridge(alpha=0, fit_intercept=True, random_state=self.random_state)
+        clf = DecisionTreeRegressor(random_state=self.random_state)
         used_features = []
         for _ in range(min(num_features, data.shape[1])):
             max_ = -100000000
@@ -75,8 +76,7 @@ class LimeBase(object):
         elif method == 'forward_selection':
             return self.forward_selection(data, labels, weights, num_features)
         elif method == 'highest_weights':
-            clf = Ridge(alpha=0.01, fit_intercept=True,
-                        random_state=self.random_state)
+            clf = DecisionTreeRegressor(random_state=self.random_state)
             clf.fit(data, labels, sample_weight=weights)
 
             coef = clf.coef_
@@ -164,7 +164,7 @@ class LimeBase(object):
                 'auto': uses forward_selection if num_features <= 6, and
                     'highest_weights' otherwise.
             model_regressor: sklearn regressor to use in explanation.
-                Defaults to Ridge regression if None. Must have
+                Defaults to Decision Tree regression if None. Must have
                 model_regressor.coef_ and 'sample_weight' as a parameter
                 to model_regressor.fit()
 
@@ -186,8 +186,7 @@ class LimeBase(object):
                                                num_features,
                                                feature_selection)
         if model_regressor is None:
-            model_regressor = Ridge(alpha=1, fit_intercept=True,
-                                    random_state=self.random_state)
+            model_regressor = DecisionTreeRegressor(random_state=self.random_state)
         easy_model = model_regressor
         easy_model.fit(neighborhood_data[:, used_features],
                        labels_column, sample_weight=weights)
