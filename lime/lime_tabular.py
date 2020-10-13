@@ -15,11 +15,11 @@ from sklearn.utils import check_random_state
 from pyDOE2 import lhs
 from scipy.stats.distributions import norm
 
-from lime.discretize import QuartileDiscretizer
-from lime.discretize import DecileDiscretizer
-from lime.discretize import EntropyDiscretizer
-from lime.discretize import BaseDiscretizer
-from lime.discretize import StatsDiscretizer
+from tree_lime.lime.discretize import QuartileDiscretizer
+from tree_lime.lime.discretize import DecileDiscretizer
+from tree_lime.lime.discretize import EntropyDiscretizer
+from tree_lime.lime.discretize import BaseDiscretizer
+from tree_lime.lime.discretize import StatsDiscretizer
 from . import explanation
 from . import lime_base
 
@@ -453,8 +453,8 @@ class LimeTabularExplainer(object):
             ret_exp.max_value = max_y
             labels = [0]
         for label in labels:
-            (ret_exp.intercept[label],
-             ret_exp.local_exp[label],
+            #(ret_exp.intercept[label],
+            (ret_exp.local_exp[label],
              ret_exp.score, ret_exp.local_pred) = self.base.explain_instance_with_data(
                     scaled_data,
                     yss,
@@ -465,7 +465,8 @@ class LimeTabularExplainer(object):
                     feature_selection=self.feature_selection)
 
         if self.mode == "regression":
-            ret_exp.intercept[1] = ret_exp.intercept[0]
+            #Removing intercept to let non linear models make use of the same code.
+            #ret_exp.intercept[1] = ret_exp.intercept[0]
             ret_exp.local_exp[1] = [x for x in ret_exp.local_exp[0]]
             ret_exp.local_exp[0] = [(i, -1 * j) for i, j in ret_exp.local_exp[1]]
 
